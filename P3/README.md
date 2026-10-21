@@ -6,7 +6,7 @@ Autor: Yousef Kassem · Cuaderno: `VC_P3.ipynb`
 
 Umbralizado de Otsu, contornos externos y `minEnclosingCircle` para medir el diámetro de cada moneda. Con un clic en la moneda de 1€ se calcula la relación mm/píxel (23.25 mm / diámetro en píxeles) y cada moneda se asigna al diámetro oficial más cercano. Los objetos no circulares (área / área del círculo < 0.8) no se cuentan.
 
-Cambios respecto al ejemplo: las 8 monedas en el diccionario, calibración por clic en lugar de un valor fijo, contornos en lugar de Hough (radios más precisos) y elección de la moneda más cercana.
+Respecto a los ejemplos del cuaderno: umbral de Otsu en lugar de umbral fijo, contornos y `minEnclosingCircle` en lugar de `HoughCircles` (radios más precisos) y relación de áreas en lugar de compacidad para descartar objetos no circulares. Se añade la calibración por clic y la clasificación por el diámetro más cercano.
 
 Resultado: **3.88 €** en la imagen ideal y **7.76 €** en una segunda imagen con 16 monedas, todas correctas.
 
