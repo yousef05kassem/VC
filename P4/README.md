@@ -96,7 +96,7 @@ Tiempo de entrenamiento: **0,144 h (≈ 9 minutos)**.
 |---|---|---|---|---|
 | 0,982 | 0,977 | 0,992 | 0,862 | 1,4 ms/imagen (GPU) |
 
-![Curvas de entrenamiento YOLO11n](img/results_yolo.png)
+![Curvas de entrenamiento YOLO11n](img/results_yolo.png.png)
 
 **Análisis:**
 
@@ -123,7 +123,7 @@ RT-DETR es un detector basado en *Transformers*. El cuaderno `VC_P4_RTDETR.ipynb
 | Tamaño del modelo | **5,5 MB** | 66,2 MB |
 | Tiempo de entrenamiento | **0,14 h** | 1,0 h |
 
-![Curvas de entrenamiento RT-DETR-L](img/results_rtdetr.png)
+![Curvas de entrenamiento RT-DETR-L](img/results_rtdetr.png.png)
 
 En RT-DETR las pérdidas son distintas (`giou_loss`, `cls_loss`, `l1_loss`). Todas disminuyen en entrenamiento y validación, así que tampoco hay sobreajuste. Las primeras épocas son más inestables que en YOLO, algo habitual en modelos basados en *Transformers*, y también se ve el salto de la época 40 al desactivar *mosaic*.
 
@@ -199,7 +199,7 @@ No aparece ningún movimiento hacia arriba o abajo. Autobús y camión no aparec
 
 En una copia limpia de cada fotograma se **pixelan todas las personas y vehículos detectados**: la región se reduce a 10×10 píxeles y se vuelve a ampliar con `INTER_NEAREST`. El resultado se guarda en un segundo vídeo, `resultado_anonimizado.mp4`, y el vídeo principal se mantiene sin pixelar para poder ver las matrículas leídas.
 
-![Vídeo anonimizado](img/anonimizado.jpg)
+![Vídeo anonimizado](img/anonimizado.jpg.jpg)
 
 Solo se anonimiza lo que detecta YOLO: las personas lejanas o pequeñas que no se detectan (por ejemplo, la persona de amarillo en el fondo) quedan sin pixelar.
 
@@ -233,7 +233,7 @@ Cuaderno: [`P4_colab_entrenamiento_y_ocr.ipynb`](P4_colab_entrenamiento_y_ocr.ip
 | Acierto exacto de noche (16 imágenes) | 18,8 % | **62,5 %** |
 | Tiempo medio por imagen | **24,7 ms** | 739,2 ms |
 
-![Comparativa OCR](img/ocr_comparativa.png)
+![Comparativa OCR](img/ocr_comparativa.png.png)
 
 **Conclusiones:**
 
