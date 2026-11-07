@@ -1,7 +1,7 @@
 # Práctica 4 y 4b · Detección de vehículos, personas y matrículas + OCR
 
-**Visión por Computador · ULPGC · Curso 2026/27**
-**Autor:** ✏️ *(tu nombre)*
+**Autor:** Yousef Ahmed Kassem · [GitHub: @yousef05kassem](https://github.com/yousef05kassem)
+**Asignatura:** Visión por Computador · ULPGC · curso 2026/27
 
 ## Índice
 
