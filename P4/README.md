@@ -1,6 +1,7 @@
 # Práctica 4 y 4b · Detección de vehículos, personas y matrículas + OCR
 
 **Autor:** Yousef Ahmed Kassem · [GitHub: @yousef05kassem](https://github.com/yousef05kassem)
+
 **Asignatura:** Visión por Computador · ULPGC · curso 2026/27
 
 ## Índice
@@ -31,8 +32,8 @@
 
 **Vídeos** (demasiado grandes para GitHub, más de 100 MB):
 
-- 🎥 Vídeo de resultados: ✏️ **[https://drive.google.com/file/d/1j_xClPceNYCxyEPqw85yxt2HrYv0VcNh/view?usp=sharing]()**
-- 🎥 Vídeo anonimizado: ✏️ **[https://drive.google.com/file/d/1Rts9uYg_4hEtPVB3LzgfErSc9o9xE5Ca/view?usp=sharing]()**
+- 🎥 Vídeo de resultados: **[resultado.mp4](https://drive.google.com/file/d/1j_xClPceNYCxyEPqw85yxt2HrYv0VcNh/view?usp=sharing)**
+- 🎥 Vídeo anonimizado: **[resultado_anonimizado.mp4](https://drive.google.com/file/d/1Rts9uYg_4hEtPVB3LzgfErSc9o9xE5Ca/view?usp=sharing)**
 
 En el código se indica con comentarios qué parte viene de la **PLANTILLA del profesor**, qué se ha **MODIFICADO** y qué es **NUEVO**.
 
