@@ -24,7 +24,7 @@
 
 | Archivo | Descripción |
 |---|---|
-| [`P4_final.ipynb`](P4_final.ipynb) | Procesamiento del vídeo de test: seguimiento, matrículas, OCR, conteo, CSV, direcciones y anonimización. Ejecutado en local (portátil sin GPU). |
+| [`P4_final.ipynb`](P4_final.ipynb) | Procesamiento del vídeo de test: seguimiento, matrículas, OCR con SmolVLM, conteo, CSV, direcciones y anonimización. Ejecutado en Google Colab (GPU NVIDIA L4). |
 | [`P4_colab_entrenamiento_y_ocr.ipynb`](P4_colab_entrenamiento_y_ocr.ipynb) | Descarga y conversión del conjunto de datos, entrenamiento de YOLO11n y RT-DETR-L, y comparativa OCR (P4b). Ejecutado en Google Colab (GPU NVIDIA L4). |
 | [`matriculas_yolo11n.pt`](matriculas_yolo11n.pt) | Detector de matrículas entrenado (YOLO11n). |
 | [`resultados.csv`](resultados.csv) | Resultado del vídeo de test, una fila por objeto y fotograma (separador `;`). |
@@ -48,7 +48,7 @@ Cambios respecto a la plantilla:
 - Lectura del vídeo de test `C0142.MP4` (1920×1080, 25 fps, 2.832 fotogramas, 113 s) en lugar de la webcam.
 - Clases ampliadas a persona, bicicleta, coche, moto, autobús y camión (`classes=[0,1,2,3,5,7]`).
 - `model.names[cls]` en lugar de la lista `classNames`, que solo tenía tres clases y fallaba con autobús o camión.
-- Parada al final del vídeo, ventana de visualización reducida y cierre correcto con ESC o con la X.
+- Parada al final del vídeo. En la versión final (Colab) no hay ventana de visualización; se muestra el progreso cada 250 fotogramas.
 - **Conteo:** para cada clase se guarda un conjunto (`set`) con los identificadores de seguimiento; el número de elementos es el número de objetos distintos.
 - **Vídeo de resultados** con `cv2.VideoWriter` (mismo tamaño y fps que el original).
 - **CSV** con las columnas del enunciado. Como `confianza` aparecía dos veces, la de la matrícula se llama `confianza_matricula`:
@@ -136,21 +136,23 @@ En RT-DETR las pérdidas son distintas (`giou_loss`, `cls_loss`, `l1_loss`). Tod
 Cuaderno: [`P4_final.ipynb`](P4_final.ipynb). Para cada fotograma:
 
 1. **Seguimiento** de personas y vehículos con YOLO11n.
-2. **Matrícula:** el detector entrenado se aplica sobre el **recorte de cada vehículo** (coche, moto, autobús o camión), donde la matrícula se ve más grande que en el fotograma completo. Solo en vehículos de al menos 120×80 px y con `imgsz=320` para que sea más rápido en CPU. Las coordenadas se pasan después al fotograma completo.
-3. **OCR (P4b):** con EasyOCR (ver la [elección del OCR](#elección-del-ocr-para-el-vídeo)). Cada vehículo se lee como mucho cada 5 fotogramas y solo si la matrícula mide al menos 60 px de ancho. Todas las lecturas se guardan por identificador y se muestra la **más votada**, ponderada por la confianza del OCR, para compensar errores puntuales.
+2. **Matrícula:** el detector entrenado se aplica sobre el **recorte de cada vehículo** (coche, moto, autobús o camión), donde la matrícula se ve más grande que en el fotograma completo. Solo en vehículos de al menos 120×80 px y con `imgsz=320`, porque el recorte es pequeño. Las coordenadas se pasan después al fotograma completo.
+3. **OCR (P4b):** con SmolVLM (ver la [elección del OCR](#elección-del-ocr-para-el-vídeo)). Cada vehículo se lee como mucho cada 5 fotogramas y solo si la matrícula mide al menos 60 px de ancho; se descartan lecturas de menos de 4 o más de 8 caracteres. Todas las lecturas se guardan por identificador y se muestra la **más votada** (cada lectura cuenta 1, SmolVLM no devuelve confianza), para compensar errores puntuales. En total se hicieron 105 lecturas con SmolVLM.
 4. Se dibuja todo en el vídeo y se escribe una fila por objeto en el CSV.
 
 ![Matrícula leída correctamente](img/video_1.jpg)
 
 ![Detalle: 1965KBP](img/video_1_detalle.jpg)
 
-![Varios objetos con identificador y trayectoria](img/video_2.jpg)
+![Varios objetos con identificador, trayectoria y matrícula leída](img/video_2.jpg)
+
+![Matrícula 1770JYG](img/video_3.jpg)
 
 ### Conteo de objetos (vídeo completo)
 
 | Clase | Objetos distintos |
 |---|---|
-| persona | 17 |
+| persona | 16 |
 | coche | 43 |
 | autobús | 2 |
 | camión | 2 |
@@ -159,24 +161,32 @@ Cuaderno: [`P4_final.ipynb`](P4_final.ipynb). Para cada fotograma:
 
 ### Matrículas leídas
 
-Se obtuvo lectura en 11 vehículos:
+Se obtuvo lectura en **26 vehículos**. En negrita, las que tienen el formato completo de una matrícula española (4 dígitos + 3 consonantes):
 
-| ID | Lectura | ID | Lectura |
-|---|---|---|---|
-| 10 | EZ3LC | 35 | BSEV |
-| 13 | LYCG | 38 | 65260 |
-| 16 | 5712 | 49 | 17ZJYG |
-| 22 | 7EMG | 53 | 8028 |
-| 24 | 0059F | **55** | **1965KBP** |
-| 27 | 0265F2 | | |
+| ID | Lectura | ID | Lectura | ID | Lectura |
+|---|---|---|---|---|---|
+| 1 | 322555 | 18 | **2314FGN** | 41 | S695LTR |
+| 8 | 1234 | 21 | 5726 | 48 | **1770JYG** |
+| 9 | **3713LKC** | 23 | **0053JFW** | 52 | 7339LG5 |
+| 10 | 515957 | 24 | 2537 | 53 | B098JXM |
+| 11 | KFST | 26 | 0285FZ | 55 | **1965KBP** |
+| 12 | **0848MCG** | 32 | **3902FXD** | 56 | 3S270 |
+| 13 | 5555 | 35 | **3685KWN** | 57 | S163LCV |
+| 15 | 6713HG3 | 36 | **9059LVY** | 60 | 1933 |
+| | | 38 | 8S36LKJ | 63 | S017H30 |
 
-Solo `1965KBP` tiene el formato completo de una matrícula española (4 dígitos + 3 letras) y coincide con la matrícula real (primera imagen). El resto son lecturas parciales o con errores, como `BSEV` en la segunda imagen.
+- **9 lecturas** tienen formato válido. En las capturas se puede comprobar que `1965KBP` y `1770JYG` coinciden con la matrícula real; un formato válido no garantiza que la lectura sea correcta.
+- Otras 4 serían válidas salvo por confundir **S con 5** o **B con 8** en la parte numérica (`8S36LKJ`, `S695LTR`, `S163LCV`, `B098JXM`).
+- Con matrículas muy pequeñas o borrosas SmolVLM a veces **inventa** un texto (`1234`, `5555`), un problema típico de los VLM.
+
+Como comparación, en una primera versión ejecutada en el portátil con **EasyOCR** solo se obtuvo lectura en 11 vehículos y únicamente `1965KBP` tenía el formato completo.
 
 ### Limitaciones
 
-- Las matrículas del vídeo son **pequeñas, inclinadas y con desenfoque de movimiento**; EasyOCR es rápido pero poco preciso en estas condiciones, lo que coincide con la comparativa de P4b.
+- Las matrículas del vídeo son **pequeñas, inclinadas y con desenfoque de movimiento**, por lo que incluso SmolVLM falla en muchas lecturas.
+- Una mejora sencilla sería corregir por posición (en los cuatro primeros caracteres solo puede haber dígitos: S → 5, B → 8, O → 0…).
 - El conteo se basa en identificadores: si el tracker pierde un objeto (por ejemplo, tras una oclusión) le asigna un identificador nuevo y se **cuenta dos veces**.
-- La clase de un mismo identificador puede cambiar entre fotogramas (por ejemplo, autobús ↔ coche). El ID 35 aparece como persona en la lista final aunque en el vídeo es un coche.
+- La clase de un mismo identificador puede cambiar entre fotogramas (por ejemplo, autobús ↔ coche). El ID 35 aparece como moto en la lista final aunque en el vídeo es una furgoneta detectada como coche (segunda imagen).
 
 ---
 
@@ -186,8 +196,8 @@ Para cada identificador se guarda la posición del centro de la caja en cada fot
 
 | Clase | Izquierda | Derecha | Parado |
 |---|---|---|---|
-| coche | 26 | 5 | 10 |
-| persona | 2 | 10 | 3 |
+| coche | 25 | 5 | 12 |
+| persona | 3 | 10 | 1 |
 | moto | 1 | 1 | 0 |
 | bicicleta | 1 | 0 | 0 |
 
@@ -247,7 +257,9 @@ Es el compromiso descrito en el enunciado: la red especializada es rápida y el 
 
 ### Elección del OCR para el vídeo
 
-Para el vídeo se ha usado **EasyOCR**. El vídeo se procesó en un portátil **sin GPU**, donde SmolVLM tardaría varios segundos por matrícula. Además, en el vídeo las matrículas no tienen recuadros grises, que era la principal desventaja de EasyOCR en la comparativa. Para compensar su menor precisión se combinan varias lecturas por vehículo mediante votación.
+En una primera versión el vídeo se procesó en un portátil **sin GPU** con **EasyOCR**, porque SmolVLM tardaría varios segundos por matrícula. El resultado fue pobre: lectura en 11 vehículos y solo una matrícula completa.
+
+A la vista de la comparativa, la versión final se ejecutó en **Google Colab con GPU (NVIDIA L4)** usando **SmolVLM**: procesar el vídeo completo (2.832 fotogramas, 105 lecturas OCR) tardó solo unos minutos y se obtuvo lectura en 26 vehículos, 9 de ellas con formato completo. Para compensar errores puntuales se combinan varias lecturas por vehículo mediante votación.
 
 ---
 
